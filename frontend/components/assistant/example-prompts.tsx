@@ -1,33 +1,19 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
+import type { MessageKey } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { AssistantMode } from "@/types/ai";
 
-export const EXAMPLE_PROMPTS: Record<AssistantMode, readonly string[]> = {
-  agent: [
-    "Create a high-priority task to review the architecture document tomorrow.",
-    "Show my pending tasks.",
-    "What tasks are overdue?",
-    "Mark my API review task as completed.",
-  ],
-  supervisor: [
-    "Plan my day.",
-    "What should I focus on first?",
-    "Summarise my progress this week.",
-    "Create a high-priority task to review the architecture document tomorrow.",
-  ],
+/** Example prompts are translated too: the assistant answers in the language it is asked in. */
+export const EXAMPLE_PROMPTS: Record<AssistantMode, readonly MessageKey[]> = {
+  agent: ["assistant.example.createTask", "assistant.example.pending", "assistant.example.overdue", "assistant.example.complete"],
+  supervisor: ["assistant.example.planDay", "assistant.example.focus", "assistant.example.summary", "assistant.example.createTask"],
 };
 
-const COPY: Record<AssistantMode, { title: string; description: string }> = {
-  agent: {
-    title: "Ask TaskAgent",
-    description: "Create, find, update and complete tasks in plain language. Deleting a task always asks for your approval first.",
-  },
-  supervisor: {
-    title: "Ask the TaskFlow Supervisor",
-    description:
-      "One request, the right specialist: TaskAgent manages tasks, PriorityAgent ranks them, PlanningAgent plans your day and SummaryAgent reports progress.",
-  },
+const COPY: Record<AssistantMode, { title: MessageKey; description: MessageKey }> = {
+  agent: { title: "assistant.intro.agent.title", description: "assistant.intro.agent.description" },
+  supervisor: { title: "assistant.intro.supervisor.title", description: "assistant.intro.supervisor.description" },
 };
 
 export function ExamplePrompts({
@@ -39,6 +25,7 @@ export function ExamplePrompts({
   onPick: (prompt: string) => void;
   disabled?: boolean;
 }) {
+  const { t } = useI18n();
   const copy = COPY[mode];
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
@@ -46,19 +33,19 @@ export function ExamplePrompts({
         <Sparkles className="size-6" aria-hidden="true" />
       </span>
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">{copy.title}</h2>
-        <p className="mt-1 max-w-md text-sm text-muted-foreground">{copy.description}</p>
+        <h2 className="text-lg font-semibold tracking-tight">{t(copy.title)}</h2>
+        <p className="mt-1 max-w-md text-sm text-muted-foreground">{t(copy.description)}</p>
       </div>
-      <ul className="grid w-full max-w-xl gap-2 sm:grid-cols-2" aria-label="Example prompts">
-        {EXAMPLE_PROMPTS[mode].map((prompt) => (
-          <li key={prompt}>
+      <ul className="grid w-full max-w-xl gap-2 sm:grid-cols-2" aria-label={t("assistant.examples")}>
+        {EXAMPLE_PROMPTS[mode].map((key) => (
+          <li key={key}>
             <button
               type="button"
-              onClick={() => onPick(prompt)}
+              onClick={() => onPick(t(key))}
               disabled={disabled}
               className="w-full rounded-xl border border-border/70 bg-card px-3 py-2.5 text-left text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent disabled:opacity-50"
             >
-              {prompt}
+              {t(key)}
             </button>
           </li>
         ))}

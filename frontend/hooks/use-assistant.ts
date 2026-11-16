@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDataRefresh } from "@/components/providers/app-providers";
 import { ApiError, getErrorMessage } from "@/lib/api/client";
 import { aiApi } from "@/lib/api/ai";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { AgentExecutionInfo, AiStatus, AssistantMode, ChatResponse, PendingConfirmation } from "@/types/ai";
 
 export type ConfirmationState = "pending" | "approved" | "rejected" | "expired";
@@ -71,10 +72,12 @@ function newId(): string {
  */
 export function useAssistant() {
   const { invalidate } = useDataRefresh();
+  const { t } = useI18n();
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [mode, setMode] = useState<AssistantMode>(DEFAULT_MODE);
   const [status, setStatus] = useState<AiStatus | null>(null);
+  const [backendUnreachable, setBackendUnreachable] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hydrated = useRef(false);
@@ -100,7 +103,11 @@ export function useAssistant() {
     aiApi
       .status(controller.signal)
       .then(setStatus)
-      .catch(() => setStatus({ available: false, message: "Cannot reach the TaskFlow backend. Is it running?" }));
+      .catch(() => {
+        // No message here: the chat shows a translated "cannot reach the backend" text instead.
+        setStatus({ available: false, message: null });
+        setBackendUnreachable(true);
+      });
     return () => controller.abort();
   }, []);
 
@@ -143,7 +150,7 @@ export function useAssistant() {
         const response: ChatResponse = mode === "supervisor" ? await aiApi.supervise(request) : await aiApi.chat(request);
         applyResponse(response, mode);
       } catch (caught) {
-        setError(getErrorMessage(caught));
+        setError(getErrorMessage(caught, t));
         setMessages((current) => current.map((item) => (item.id === userMessage.id ? { ...item, failed: true } : item)));
         // A supervisor turn can fail after TaskAgent already changed data (a later LLM call timing out), and the
         // error response carries no dataChanged flag. Refresh so the lists show what was saved before a retry.
@@ -152,7 +159,7 @@ export function useAssistant() {
         setIsSending(false);
       }
     },
-    [applyResponse, conversationId, invalidate, isSending, mode],
+    [applyResponse, conversationId, invalidate, isSending, mode, t],
   );
 
   const decide = useCallback(
@@ -178,12 +185,12 @@ export function useAssistant() {
             current.map((item) => (item.id === messageId ? { ...item, confirmationState: "expired" } : item)),
           );
         }
-        setError(getErrorMessage(caught));
+        setError(getErrorMessage(caught, t));
       } finally {
         setIsSending(false);
       }
     },
-    [applyResponse, conversationId, isSending, mode],
+    [applyResponse, conversationId, isSending, mode, t],
   );
 
   const newConversation = useCallback(() => {
@@ -214,6 +221,7 @@ export function useAssistant() {
     mode,
     setMode: changeMode,
     status,
+    backendUnreachable,
     isSending,
     error,
     send,

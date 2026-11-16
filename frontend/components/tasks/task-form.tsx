@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { PRIORITY_LABELS, STATUS_LABELS } from "@/lib/task-labels";
+import { isMessageKey } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
+import { priorityLabelKey, statusLabelKey } from "@/lib/task-labels";
 import { defaultTaskFormValues, taskFormSchema, type TaskFormValues } from "@/lib/validations/task";
 import { TASK_PRIORITIES, TASK_STATUSES } from "@/types/task";
 
@@ -21,16 +23,19 @@ export interface TaskFormProps {
   isSubmitting?: boolean;
 }
 
+/** Validation messages are translation keys (see lib/validations); unknown text is shown as-is. */
 function FieldError({ id, message }: { id: string; message?: string }) {
+  const { t } = useI18n();
   if (!message) return null;
   return (
     <p id={id} role="alert" className="text-sm text-destructive">
-      {message}
+      {isMessageKey(message) ? t(message) : message}
     </p>
   );
 }
 
 export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting = false }: TaskFormProps) {
+  const { t } = useI18n();
   const ids = {
     title: useId(),
     description: useId(),
@@ -51,10 +56,10 @@ export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting
   return (
     <form onSubmit={form.handleSubmit((values) => onSubmit(values))} className="flex flex-1 flex-col gap-5" noValidate>
       <div className="space-y-2">
-        <Label htmlFor={ids.title}>Title</Label>
+        <Label htmlFor={ids.title}>{t("taskForm.title")}</Label>
         <Input
           id={ids.title}
-          placeholder="What needs to be done?"
+          placeholder={t("taskForm.titlePlaceholder")}
           autoFocus
           maxLength={150}
           aria-invalid={Boolean(errors.title)}
@@ -66,12 +71,12 @@ export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor={ids.description}>Description</Label>
+          <Label htmlFor={ids.description}>{t("taskForm.description")}</Label>
           <span className="text-xs text-muted-foreground tabular-nums">{description.length}/2000</span>
         </div>
         <Textarea
           id={ids.description}
-          placeholder="Add details, links or notes (optional)"
+          placeholder={t("taskForm.descriptionPlaceholder")}
           rows={5}
           maxLength={2000}
           aria-invalid={Boolean(errors.description)}
@@ -83,19 +88,19 @@ export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor={ids.priority}>Priority</Label>
+          <Label htmlFor={ids.priority}>{t("taskForm.priority")}</Label>
           <Controller
             control={form.control}
             name="priority"
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger id={ids.priority} className="w-full" aria-invalid={Boolean(errors.priority)}>
-                  <SelectValue placeholder="Choose a priority" />
+                  <SelectValue placeholder={t("taskForm.priorityPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {TASK_PRIORITIES.map((priority) => (
                     <SelectItem key={priority} value={priority}>
-                      {PRIORITY_LABELS[priority]}
+                      {t(priorityLabelKey(priority))}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -107,19 +112,19 @@ export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting
 
         {mode === "edit" ? (
           <div className="space-y-2">
-            <Label htmlFor={ids.status}>Status</Label>
+            <Label htmlFor={ids.status}>{t("taskForm.status")}</Label>
             <Controller
               control={form.control}
               name="status"
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id={ids.status} className="w-full" aria-invalid={Boolean(errors.status)}>
-                    <SelectValue placeholder="Choose a status" />
+                    <SelectValue placeholder={t("taskForm.statusPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {TASK_STATUSES.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {STATUS_LABELS[status]}
+                        {t(statusLabelKey(status))}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -131,7 +136,7 @@ export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting
         ) : null}
 
         <div className="space-y-2">
-          <Label htmlFor={ids.dueDate}>Due date</Label>
+          <Label htmlFor={ids.dueDate}>{t("taskForm.dueDate")}</Label>
           <Input
             id={ids.dueDate}
             type="date"
@@ -145,11 +150,11 @@ export function TaskForm({ mode, defaultValues, onSubmit, onCancel, isSubmitting
 
       <div className="mt-auto flex items-center justify-end gap-2 border-t pt-4">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="animate-spin" data-icon="inline-start" /> : null}
-          {mode === "create" ? "Create task" : "Save changes"}
+          {mode === "create" ? t("taskForm.create") : t("taskForm.save")}
         </Button>
       </div>
     </form>

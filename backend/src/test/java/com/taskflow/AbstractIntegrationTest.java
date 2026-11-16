@@ -17,8 +17,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
  */
 @SpringBootTest
 // A placeholder key lets the LangChain4j starter create its ChatModel bean; nothing in these tests ever
-// calls OpenAI (the AI tests replace the model with a scripted double).
-@TestPropertySource(properties = "langchain4j.open-ai.chat-model.api-key=test-key")
+// calls Claude (the AI tests replace the model with a scripted double).
+@TestPropertySource(properties = "langchain4j.anthropic.chat-model.api-key=test-key")
 public abstract class AbstractIntegrationTest {
 
     @ServiceConnection

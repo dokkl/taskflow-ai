@@ -1,17 +1,19 @@
 "use client";
 
 import { Bot, Network } from "lucide-react";
+import type { MessageKey } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { cn } from "@/lib/utils";
 import type { AssistantMode } from "@/types/ai";
 
-export const MODE_LABELS: Record<AssistantMode, string> = {
-  agent: "TaskAgent",
-  supervisor: "Supervisor",
+const MODE_LABELS: Record<AssistantMode, MessageKey> = {
+  agent: "assistant.mode.agent",
+  supervisor: "assistant.mode.supervisor",
 };
 
-const MODE_HELP: Record<AssistantMode, string> = {
-  agent: "One agent that creates, finds and updates tasks (Phase 1).",
-  supervisor: "Routes to TaskAgent, PriorityAgent, PlanningAgent and SummaryAgent (Phase 2).",
+const MODE_HELP: Record<AssistantMode, MessageKey> = {
+  agent: "assistant.modeHelp.agent",
+  supervisor: "assistant.modeHelp.supervisor",
 };
 
 interface ModeSwitchProps {
@@ -22,8 +24,9 @@ interface ModeSwitchProps {
 
 /** Segmented control choosing which backend entry point answers the next message. */
 export function ModeSwitch({ mode, onChange, disabled }: ModeSwitchProps) {
+  const { t } = useI18n();
   return (
-    <div role="radiogroup" aria-label="Assistant mode" className="inline-flex rounded-lg border border-border/70 bg-muted/40 p-0.5">
+    <div role="radiogroup" aria-label={t("assistant.mode")} className="inline-flex rounded-lg border border-border/70 bg-muted/40 p-0.5">
       {(["supervisor", "agent"] as const).map((option) => {
         const selected = option === mode;
         const Icon = option === "supervisor" ? Network : Bot;
@@ -33,7 +36,7 @@ export function ModeSwitch({ mode, onChange, disabled }: ModeSwitchProps) {
             type="button"
             role="radio"
             aria-checked={selected}
-            title={selected ? MODE_HELP[option] : `${MODE_HELP[option]} Switching starts a new conversation.`}
+            title={selected ? t(MODE_HELP[option]) : `${t(MODE_HELP[option])} ${t("assistant.modeSwitchNote")}`}
             disabled={disabled}
             onClick={() => onChange(option)}
             className={cn(
@@ -42,7 +45,7 @@ export function ModeSwitch({ mode, onChange, disabled }: ModeSwitchProps) {
             )}
           >
             <Icon className="size-3.5" aria-hidden="true" />
-            {MODE_LABELS[option]}
+            {t(MODE_LABELS[option])}
           </button>
         );
       })}

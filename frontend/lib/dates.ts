@@ -23,20 +23,20 @@ export function isIsoDate(value: string | null | undefined): value is string {
   return typeof value === "string" && ISO_DATE.test(value);
 }
 
-/** "Nov 15, 2026" */
-export function formatDate(isoDate: string): string {
+/** "Nov 15, 2026" (en-US) or "2026. 11. 15." (ko-KR). */
+export function formatDate(isoDate: string, locale = "en-US"): string {
   const [year, month, day] = isoDate.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
     new Date(Date.UTC(year, month - 1, day)),
   );
 }
 
-/** "Monday, November 2, 2026" in the user's timezone. */
-export function formatLongDate(now: Date, timeZone: string): string {
+/** "Monday, November 2, 2026" (en-US) or "2026년 11월 2일 월요일" (ko-KR) in the user's timezone. */
+export function formatLongDate(now: Date, timeZone: string, locale = "en-US"): string {
   try {
-    return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone }).format(now);
+    return new Intl.DateTimeFormat(locale, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone }).format(now);
   } catch {
-    return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(now);
+    return new Intl.DateTimeFormat(locale, { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(now);
   }
 }
 
@@ -51,15 +51,15 @@ export function getDueState(dueDate: string | null | undefined, status: TaskStat
   return "upcoming";
 }
 
-/** Short relative label shown next to the due date. */
-export function describeDueState(state: DueState): string | null {
+/** Translation key of the short relative label shown next to the due date. */
+export function dueStateLabelKey(state: DueState): "due.overdue" | "due.today" | "due.tomorrow" | null {
   switch (state) {
     case "overdue":
-      return "Overdue";
+      return "due.overdue";
     case "today":
-      return "Today";
+      return "due.today";
     case "tomorrow":
-      return "Tomorrow";
+      return "due.tomorrow";
     default:
       return null;
   }

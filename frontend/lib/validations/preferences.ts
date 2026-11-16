@@ -9,17 +9,18 @@ export function isValidTimezone(value: string): boolean {
   }
 }
 
+/** Error messages are translation keys from lib/i18n/messages. */
 export const preferencesFormSchema = z.object({
   timezone: z
     .string()
     .trim()
-    .min(1, "Timezone is required")
-    .refine(isValidTimezone, "Enter a valid IANA timezone such as Asia/Colombo"),
+    .min(1, "validation.timezoneRequired")
+    .refine(isValidTimezone, "validation.timezoneInvalid"),
   dailyAvailableMinutes: z
-    .number({ message: "Enter a number of minutes" })
-    .int("Minutes must be a whole number")
-    .min(0, "Minutes must be at least 0")
-    .max(1440, "Minutes must be at most 1440 (24 hours)"),
+    .number({ message: "validation.minutesNumber" })
+    .int("validation.minutesInteger")
+    .min(0, "validation.minutesMin")
+    .max(1440, "validation.minutesMax"),
 });
 
 export type PreferencesFormValues = z.infer<typeof preferencesFormSchema>;

@@ -5,7 +5,8 @@ import { PriorityBadge, StatusBadge } from "@/components/tasks/task-badges";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { describeDueState, formatDate, getDueState } from "@/lib/dates";
+import { dueStateLabelKey, formatDate, getDueState } from "@/lib/dates";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { cn } from "@/lib/utils";
 import type { Task, TaskStatus } from "@/types/task";
 
@@ -33,10 +34,12 @@ function ActionButton({ label, onClick, disabled, children }: { label: string; o
 }
 
 export function TaskCard({ task, today, onEdit, onDelete, onStatusChange, disabled }: TaskCardProps) {
+  const { t, intlLocale } = useI18n();
   const completed = task.status === "COMPLETED";
   const dueState = getDueState(task.dueDate, task.status, today);
   const overdue = dueState === "overdue";
-  const dueLabel = describeDueState(dueState);
+  const dueLabelKey = dueStateLabelKey(dueState);
+  const dueLabel = dueLabelKey ? t(dueLabelKey) : null;
 
   return (
     <Card
@@ -52,13 +55,13 @@ export function TaskCard({ task, today, onEdit, onDelete, onStatusChange, disabl
         <Button
           variant="outline"
           size="icon-sm"
-          aria-label={completed ? "Mark as not completed" : "Mark as completed"}
+          aria-label={completed ? t("task.markNotCompleted") : t("task.markCompleted")}
           aria-pressed={completed}
           disabled={disabled}
           onClick={() => onStatusChange(task, completed ? "TODO" : "COMPLETED")}
           className={cn("mt-0.5 shrink-0 rounded-full", completed && "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground")}
         >
-          {completed ? <Check /> : <span className="sr-only">Complete</span>}
+          {completed ? <Check /> : <span className="sr-only">{t("task.complete")}</span>}
         </Button>
 
         <div className="min-w-0 flex-1">
@@ -66,23 +69,23 @@ export function TaskCard({ task, today, onEdit, onDelete, onStatusChange, disabl
             <h3 className={cn("text-base font-medium leading-snug", completed && "text-muted-foreground line-through")}>{task.title}</h3>
             <div className="flex shrink-0 items-center gap-1">
               {task.status === "TODO" ? (
-                <ActionButton label="Start task" onClick={() => onStatusChange(task, "IN_PROGRESS")} disabled={disabled}>
+                <ActionButton label={t("task.start")} onClick={() => onStatusChange(task, "IN_PROGRESS")} disabled={disabled}>
                   <Play />
                 </ActionButton>
               ) : null}
               {completed ? (
-                <ActionButton label="Reopen task" onClick={() => onStatusChange(task, "TODO")} disabled={disabled}>
+                <ActionButton label={t("task.reopen")} onClick={() => onStatusChange(task, "TODO")} disabled={disabled}>
                   <RotateCcw />
                 </ActionButton>
               ) : (
-                <ActionButton label="Complete task" onClick={() => onStatusChange(task, "COMPLETED")} disabled={disabled}>
+                <ActionButton label={t("task.completeTask")} onClick={() => onStatusChange(task, "COMPLETED")} disabled={disabled}>
                   <Check />
                 </ActionButton>
               )}
-              <ActionButton label="Edit task" onClick={() => onEdit(task)} disabled={disabled}>
+              <ActionButton label={t("task.edit")} onClick={() => onEdit(task)} disabled={disabled}>
                 <Pencil />
               </ActionButton>
-              <ActionButton label="Delete task" onClick={() => onDelete(task)} disabled={disabled}>
+              <ActionButton label={t("task.delete")} onClick={() => onDelete(task)} disabled={disabled}>
                 <Trash2 className="text-destructive" />
               </ActionButton>
             </div>
@@ -102,8 +105,8 @@ export function TaskCard({ task, today, onEdit, onDelete, onStatusChange, disabl
                 )}
               >
                 <CalendarDays className="size-3.5" aria-hidden="true" />
-                <span>Due {formatDate(task.dueDate)}</span>
-                {dueLabel ? <span aria-label={`Due status: ${dueLabel}`}>· {dueLabel}</span> : null}
+                <span>{t("due.on", { date: formatDate(task.dueDate, intlLocale) })}</span>
+                {dueLabel ? <span aria-label={t("due.status", { label: dueLabel })}>· {dueLabel}</span> : null}
               </span>
             ) : null}
           </div>

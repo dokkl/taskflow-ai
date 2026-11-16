@@ -6,6 +6,7 @@ import { TaskCard } from "@/components/tasks/task-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getErrorMessage } from "@/lib/api/client";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { Task, TaskStatus } from "@/types/task";
 
 export interface TaskListProps {
@@ -24,8 +25,9 @@ export interface TaskListProps {
 }
 
 function TaskListSkeleton() {
+  const { t } = useI18n();
   return (
-    <div className="space-y-3" aria-busy="true" aria-label="Loading tasks">
+    <div className="space-y-3" aria-busy="true" aria-label={t("tasks.loading")}>
       {Array.from({ length: 4 }).map((_, index) => (
         <div key={index} className="rounded-xl border bg-background p-4 shadow-sm">
           <div className="flex items-start gap-3">
@@ -59,6 +61,7 @@ export function TaskList({
   emptyDescription,
   mutating,
 }: TaskListProps) {
+  const { t } = useI18n();
   if (isLoading && !tasks) {
     return <TaskListSkeleton />;
   }
@@ -67,9 +70,9 @@ export function TaskList({
     return (
       <div role="alert" className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
         <AlertTriangle className="size-4 text-destructive" aria-hidden="true" />
-        <span className="flex-1">Could not load tasks: {getErrorMessage(error)}</span>
+        <span className="flex-1">{t("tasks.loadError", { message: getErrorMessage(error, t) })}</span>
         <Button variant="outline" size="sm" onClick={onRetry}>
-          Retry
+          {t("common.retry")}
         </Button>
       </div>
     );

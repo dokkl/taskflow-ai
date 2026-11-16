@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { Task } from "@/types/task";
 
 interface DeleteTaskDialogProps {
@@ -20,17 +21,18 @@ interface DeleteTaskDialogProps {
 }
 
 export function DeleteTaskDialog({ task, onConfirm, onCancel, isPending }: DeleteTaskDialogProps) {
+  const { t } = useI18n();
   return (
     <AlertDialog open={task !== null} onOpenChange={(open) => (open ? undefined : onCancel())}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this task?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            {task ? <>&ldquo;{task.title}&rdquo; will be permanently removed. This cannot be undone.</> : null}
+            {task ? t("deleteDialog.description", { title: task.title }) : null}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>{t("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={isPending}
@@ -39,7 +41,7 @@ export function DeleteTaskDialog({ task, onConfirm, onCancel, isPending }: Delet
               if (task) onConfirm(task);
             }}
           >
-            Delete
+            {t("common.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
