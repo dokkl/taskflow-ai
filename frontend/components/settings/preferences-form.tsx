@@ -14,6 +14,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getErrorMessage } from "@/lib/api/client";
 import { preferencesApi } from "@/lib/api/preferences";
 import { todayInTimezone } from "@/lib/dates";
+import { isMessageKey } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { preferencesFormSchema, type PreferencesFormValues } from "@/lib/validations/preferences";
 
 function supportedTimezones(): string[] {
@@ -25,6 +27,7 @@ function supportedTimezones(): string[] {
 }
 
 export function PreferencesForm() {
+  const { t } = useI18n();
   const { preferences, setPreferences } = useUserPreferences();
   const { invalidate } = useDataRefresh();
   const [isSaving, setIsSaving] = useState(false);
@@ -42,16 +45,21 @@ export function PreferencesForm() {
   const watchedTimezone = useWatch({ control: form.control, name: "timezone" });
   const watchedMinutes = Number(useWatch({ control: form.control, name: "dailyAvailableMinutes" }));
 
+  /** Schema messages are translation keys (see lib/validations/preferences). */
+  function translateError(message: string | undefined): string | undefined {
+    return isMessageKey(message) ? t(message) : message;
+  }
+
   async function onSubmit(values: PreferencesFormValues) {
     setIsSaving(true);
     try {
       const updated = await preferencesApi.update(values);
       setPreferences(updated);
       invalidate(); // dashboard "today" depends on the timezone
-      toast.success("Preferences saved");
+      toast.success(t("toast.preferencesSaved"));
       form.reset({ timezone: updated.timezone, dailyAvailableMinutes: updated.dailyAvailableMinutes });
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      toast.error(getErrorMessage(error, t));
     } finally {
       setIsSaving(false);
     }
@@ -73,13 +81,13 @@ export function PreferencesForm() {
   return (
     <Card className="rounded-xl shadow-sm">
       <CardHeader>
-        <CardTitle>Preferences</CardTitle>
-        <CardDescription>These settings drive date calculations today and daily planning in later phases.</CardDescription>
+        <CardTitle>{t("settings.title")}</CardTitle>
+        <CardDescription>{t("settings.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
           <div className="space-y-2">
-            <Label htmlFor={ids.timezone}>Timezone</Label>
+            <Label htmlFor={ids.timezone}>{t("settings.timezone")}</Label>
             <Input
               id={ids.timezone}
               list={timezoneListId}
@@ -96,17 +104,17 @@ export function PreferencesForm() {
             </datalist>
             {errors.timezone ? (
               <p role="alert" className="text-sm text-destructive">
-                {errors.timezone.message}
+                {translateError(errors.timezone.message)}
               </p>
             ) : (
               <p id={`${ids.timezone}-hint`} className="text-xs text-muted-foreground">
-                IANA identifier. Today in this timezone: {watchedTimezone && !errors.timezone ? todayInTimezone(watchedTimezone) : "—"}
+                {t("settings.timezoneHint", { today: watchedTimezone && !errors.timezone ? todayInTimezone(watchedTimezone) : "—" })}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={ids.minutes}>Daily available minutes</Label>
+            <Label htmlFor={ids.minutes}>{t("settings.minutes")}</Label>
             <Input
               id={ids.minutes}
               type="number"
@@ -119,11 +127,11 @@ export function PreferencesForm() {
             />
             {errors.dailyAvailableMinutes ? (
               <p role="alert" className="text-sm text-destructive">
-                {errors.dailyAvailableMinutes.message}
+                {translateError(errors.dailyAvailableMinutes.message)}
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                {Number.isFinite(watchedMinutes) ? `${(watchedMinutes / 60).toFixed(1)} hours per day` : "Minutes you can dedicate to tasks each day"}
+                {Number.isFinite(watchedMinutes) ? t("settings.hoursPerDay", { hours: (watchedMinutes / 60).toFixed(1) }) : t("settings.minutesHint")}
               </p>
             )}
           </div>
@@ -131,10 +139,10 @@ export function PreferencesForm() {
           <div className="flex items-center gap-2 border-t pt-4">
             <Button type="submit" disabled={isSaving || !isDirty}>
               {isSaving ? <Loader2 className="animate-spin" data-icon="inline-start" /> : null}
-              Save preferences
+              {t("settings.save")}
             </Button>
             <Button type="button" variant="ghost" disabled={isSaving || !isDirty} onClick={() => form.reset()}>
-              Reset
+              {t("common.reset")}
             </Button>
           </div>
         </form>

@@ -4,6 +4,7 @@ import { useTaskForm } from "@/components/providers/app-providers";
 import { TaskForm } from "@/components/tasks/task-form";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useTaskMutations } from "@/hooks/use-task-mutations";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { TaskFormValues } from "@/lib/validations/task";
 import type { Task } from "@/types/task";
 
@@ -23,6 +24,7 @@ function toFormValues(task: Task): Partial<TaskFormValues> {
  */
 export function TaskFormSheet() {
   const { state, close } = useTaskForm();
+  const { t } = useI18n();
   const { createTask, updateTask, isPending } = useTaskMutations();
 
   const editingTask = state.open ? state.task : null;
@@ -43,9 +45,9 @@ export function TaskFormSheet() {
     <Sheet open={state.open} onOpenChange={(open) => (open ? undefined : close())}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-lg">
         <SheetHeader className="border-b px-6 py-5">
-          <SheetTitle>{mode === "create" ? "New task" : "Edit task"}</SheetTitle>
+          <SheetTitle>{mode === "create" ? t("taskForm.newTitle") : t("taskForm.editTitle")}</SheetTitle>
           <SheetDescription>
-            {mode === "create" ? "Add a task to your list. You can change everything later." : "Update the details, priority, status or due date."}
+            {mode === "create" ? t("taskForm.newDescription") : t("taskForm.editDescription")}
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-1 flex-col overflow-y-auto px-6 py-5">

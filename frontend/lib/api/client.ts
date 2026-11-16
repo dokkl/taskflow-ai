@@ -1,3 +1,4 @@
+import { translateEn, type Translator } from "@/lib/i18n/messages";
 import type { ProblemDetail } from "@/types/api";
 
 /**
@@ -95,13 +96,18 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   return (await response.json()) as T;
 }
 
-/** Human-friendly message for any error thrown by the API layer. */
-export function getErrorMessage(error: unknown): string {
+/**
+ * Human-friendly message for any error thrown by the API layer. Pass the `t` from `useI18n` to get
+ * client-side messages (network failure, generic error) in the user's language; messages written by
+ * the backend (Problem Details) are shown as the backend sent them.
+ */
+export function getErrorMessage(error: unknown, t: Translator = translateEn): string {
   if (error instanceof ApiError) {
+    if (error.status === 0) return t("error.network");
     const fields = Object.values(error.fieldErrors);
     if (fields.length > 0) return fields.join(". ");
     return error.detail ?? error.title;
   }
   if (error instanceof Error) return error.message;
-  return "Something went wrong";
+  return t("error.generic");
 }

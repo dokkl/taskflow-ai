@@ -10,6 +10,8 @@ import { useTaskMutations } from "@/hooks/use-task-mutations";
 import { useTaskQueryParams, type TaskListParams } from "@/hooks/use-task-query-params";
 import { useTasks } from "@/hooks/use-tasks";
 import { addDays, todayInTimezone } from "@/lib/dates";
+import type { MessageKey } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import type { Task, TaskQuery } from "@/types/task";
 
 /** Which slice of tasks a page shows. Resolved against today's date in the user's timezone. */
@@ -35,15 +37,16 @@ export interface TaskViewProps {
   /** Default values for the URL-backed filter/sort parameters. */
   defaults?: Partial<TaskListParams>;
   showStatusFilter?: boolean;
-  emptyTitle: string;
-  emptyDescription: string;
+  emptyTitleKey: MessageKey;
+  emptyDescriptionKey: MessageKey;
 }
 
 /**
  * The reusable "task list with filters, sorting and pagination" block used by
  * every list page. Filters live in the URL so views can be bookmarked.
  */
-export function TaskView({ scope = "all", defaults, showStatusFilter = true, emptyTitle, emptyDescription }: TaskViewProps) {
+export function TaskView({ scope = "all", defaults, showStatusFilter = true, emptyTitleKey, emptyDescriptionKey }: TaskViewProps) {
+  const { t } = useI18n();
   const { timezone } = useUserPreferences();
   const today = todayInTimezone(timezone);
   const { params, setParams, reset } = useTaskQueryParams(defaults);
@@ -86,8 +89,8 @@ export function TaskView({ scope = "all", defaults, showStatusFilter = true, emp
         onDelete={setPendingDelete}
         onStatusChange={changeStatus}
         onAddTask={openCreate}
-        emptyTitle={emptyTitle}
-        emptyDescription={emptyDescription}
+        emptyTitle={t(emptyTitleKey)}
+        emptyDescription={t(emptyDescriptionKey)}
         mutating={isPending}
       />
 

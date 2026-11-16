@@ -15,10 +15,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "TaskFlow AI",
-    template: "%s · TaskFlow AI",
-  },
   description: "A modern personal task manager built with Spring Boot, PostgreSQL and Next.js.",
 };
 

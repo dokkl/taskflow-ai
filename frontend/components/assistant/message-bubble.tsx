@@ -3,6 +3,8 @@
 import { Bot, User } from "lucide-react";
 import { ConfirmationCard } from "@/components/assistant/confirmation-card";
 import type { AssistantMessage } from "@/hooks/use-assistant";
+import type { Translator } from "@/lib/i18n/messages";
+import { useI18n } from "@/lib/i18n/use-i18n";
 import { cn } from "@/lib/utils";
 import type { PendingConfirmation } from "@/types/ai";
 
@@ -13,31 +15,33 @@ interface MessageBubbleProps {
   disabled?: boolean;
 }
 
-function describeExecution(message: AssistantMessage): string | null {
+function describeExecution(message: AssistantMessage, t: Translator): string | null {
   const execution = message.execution;
   if (!execution) return null;
+  const failed = `, ${t("assistant.execution.failed")}`;
   const parts: string[] = [];
   if (execution.agents && execution.agents.length > 0) {
-    parts.push(
-      `Agents: ${execution.agents.map((call) => `${call.name} (${call.durationMs} ms${call.success ? "" : ", failed"})`).join(" > ")}`,
-    );
+    const list = execution.agents.map((call) => `${call.name} (${call.durationMs} ms${call.success ? "" : failed})`).join(" > ");
+    parts.push(t("assistant.execution.agents", { list }));
   } else if (execution.agents && message.mode === "supervisor") {
-    parts.push("Answered by the supervisor directly");
+    parts.push(t("assistant.execution.direct"));
   }
   if (execution.toolCalls.length > 0) {
-    parts.push(
-      `Tools: ${execution.toolCalls.map((call) => `${call.name} (${call.durationMs} ms${call.success ? "" : ", failed"})`).join(", ")}`,
-    );
+    const list = execution.toolCalls.map((call) => `${call.name} (${call.durationMs} ms${call.success ? "" : failed})`).join(", ");
+    parts.push(t("assistant.execution.tools", { list }));
   }
-  if (execution.llmCalls) parts.push(`${execution.llmCalls} LLM call${execution.llmCalls === 1 ? "" : "s"}`);
-  if (execution.tokenUsage?.totalTokens) parts.push(`${execution.tokenUsage.totalTokens} tokens`);
+  if (execution.llmCalls) {
+    parts.push(t(execution.llmCalls === 1 ? "assistant.execution.llmCall" : "assistant.execution.llmCalls", { count: execution.llmCalls }));
+  }
+  if (execution.tokenUsage?.totalTokens) parts.push(t("assistant.execution.tokens", { count: execution.tokenUsage.totalTokens }));
   parts.push(`${execution.durationMs} ms`);
   return parts.join(" · ");
 }
 
 export function MessageBubble({ message, onApprove, onReject, disabled }: MessageBubbleProps) {
+  const { t } = useI18n();
   const isUser = message.role === "user";
-  const execution = describeExecution(message);
+  const execution = describeExecution(message, t);
 
   return (
     <div
@@ -79,14 +83,14 @@ export function MessageBubble({ message, onApprove, onReject, disabled }: Messag
 
         {execution ? (
           <details className="text-xs text-muted-foreground">
-            <summary className="cursor-pointer select-none">Execution details</summary>
+            <summary className="cursor-pointer select-none">{t("assistant.execution")}</summary>
             <p className="mt-1 font-mono text-[11px]">
               {execution}
-              {message.execution ? ` · request ${message.execution.requestId.slice(0, 8)}` : null}
+              {message.execution ? ` · ${t("assistant.execution.request", { id: message.execution.requestId.slice(0, 8) })}` : null}
             </p>
           </details>
         ) : null}
-        {message.failed ? <p className="text-xs text-destructive">Not sent</p> : null}
+        {message.failed ? <p className="text-xs text-destructive">{t("assistant.notSent")}</p> : null}
       </div>
     </div>
   );

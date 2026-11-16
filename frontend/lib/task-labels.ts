@@ -1,28 +1,9 @@
-import type { SortDirection, TaskPriority, TaskSortField, TaskStatus } from "@/types/task";
+import type { TaskPriority, TaskSortField, TaskStatus } from "@/types/task";
 
-export const STATUS_LABELS: Record<TaskStatus, string> = {
-  TODO: "To do",
-  IN_PROGRESS: "In progress",
-  COMPLETED: "Completed",
-};
-
-export const PRIORITY_LABELS: Record<TaskPriority, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
-
-export const SORT_FIELD_LABELS: Record<TaskSortField, string> = {
-  CREATED_AT: "Created",
-  UPDATED_AT: "Last updated",
-  DUE_DATE: "Due date",
-  PRIORITY: "Priority",
-};
-
-export const SORT_DIRECTION_LABELS: Record<SortDirection, string> = {
-  ASC: "Ascending",
-  DESC: "Descending",
-};
+/** Translation keys for the enum labels; resolve them with `t()` from `useI18n`. */
+export const statusLabelKey = (status: TaskStatus) => `status.${status}` as const;
+export const priorityLabelKey = (priority: TaskPriority) => `priority.${priority}` as const;
+export const sortFieldLabelKey = (field: TaskSortField) => `sort.${field}` as const;
 
 /** Tailwind classes for the coloured badges. Kept together so the palette stays consistent. */
 export const STATUS_BADGE_CLASSES: Record<TaskStatus, string> = {
