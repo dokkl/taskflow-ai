@@ -29,7 +29,7 @@ public class OpenApiConfig {
                                 Phase 0 exposes plain task management: CRUD, filtering, sorting, pagination, \
                                 dashboard statistics and single-user preferences. \
                                 Phase 1 adds the AI assistant (POST /api/ai/chat): a LangChain4j TaskAgent backed by \
-                                OpenAI that manages tasks through tool calling, with conversation memory. \
+                                Claude (Anthropic) that manages tasks through tool calling, with conversation memory. \
                                 Phase 2 adds the multi-agent system (POST /api/ai/supervisor/chat): a TaskFlowSupervisor \
                                 that routes each request to specialised agents (TaskAgent, PriorityAgent, PlanningAgent, \
                                 SummaryAgent) and reports which agents and tools it used. \

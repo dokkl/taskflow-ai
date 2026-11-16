@@ -24,7 +24,7 @@ export const en = {
   "page.dashboard.emptyTitle": "No tasks yet",
   "page.dashboard.emptyDescription": "Create your first task to start planning your day.",
   "page.assistant.description":
-    "Manage your tasks in plain language. Switch between the single TaskAgent and the TaskFlow Supervisor that routes to specialised agents (LangChain4j + OpenAI).",
+    "Manage your tasks in plain language. Switch between the single TaskAgent and the TaskFlow Supervisor that routes to specialised agents (LangChain4j + Claude).",
   "page.tasks.description": "Every task, with filters, sorting and pagination.",
   "page.tasks.emptyTitle": "No tasks found",
   "page.tasks.emptyDescription": "Try clearing the filters, or add a new task.",
@@ -249,7 +249,7 @@ export const ko: Messages = {
   "page.dashboard.emptyTitle": "아직 작업이 없습니다",
   "page.dashboard.emptyDescription": "첫 작업을 만들어 하루 계획을 시작해 보세요.",
   "page.assistant.description":
-    "자연어로 작업을 관리하세요. 단일 TaskAgent와 전문 에이전트에게 요청을 분배하는 TaskFlow Supervisor(LangChain4j + OpenAI) 중에서 선택할 수 있습니다.",
+    "자연어로 작업을 관리하세요. 단일 TaskAgent와 전문 에이전트에게 요청을 분배하는 TaskFlow Supervisor(LangChain4j + Claude) 중에서 선택할 수 있습니다.",
   "page.tasks.description": "필터, 정렬, 페이지 이동을 지원하는 전체 작업 목록입니다.",
   "page.tasks.emptyTitle": "작업을 찾을 수 없습니다",
   "page.tasks.emptyDescription": "필터를 해제하거나 새 작업을 추가해 보세요.",

@@ -22,17 +22,22 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
-# LangChain4j Spring Boot starter (langchain4j-open-ai-spring-boot-starter).
+# LangChain4j Spring Boot starter (langchain4j-anthropic-spring-boot-starter).
 # Creates the ChatModel bean that @AiService interfaces (TaskAgent) use automatically.
 langchain4j:
-  open-ai:
+  anthropic:
     chat-model:
-      api-key: ${OPENAI_API_KEY:test-key}
-      model-name: ${OPENAI_MODEL_NAME:gpt-4o-mini}
-      temperature: ${OPENAI_TEMPERATURE:0.2}
+      api-key: ${ANTHROPIC_API_KEY:test-key}
+      model-name: ${ANTHROPIC_MODEL_NAME:claude-haiku-5-5}
+      # Claude Haiku 5.5 rejects non-default temperature/top_p/top_k, so no sampling parameters are set.
+      # Haiku 5.5 thinks adaptively by default and thinking tokens count toward max-tokens.
+      max-tokens: ${ANTHROPIC_MAX_TOKENS:8192}
+      # Keep thinking blocks on the AiMessage and send them back on the next tool-loop turn.
+      return-thinking: true
+      send-thinking: true
       # Logs full request/response bodies (including task content). Development only.
-      log-requests: ${OPENAI_LOG_REQUESTS:false}
-      log-responses: ${OPENAI_LOG_RESPONSES:false}
+      log-requests: ${ANTHROPIC_LOG_REQUESTS:false}
+      log-responses: ${ANTHROPIC_LOG_RESPONSES:false}
 
 taskflow:
   cors:

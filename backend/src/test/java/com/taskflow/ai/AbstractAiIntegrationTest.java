@@ -7,11 +7,11 @@ import org.springframework.test.context.TestPropertySource;
 
 /**
  * Full application context for AI tests: real PostgreSQL, MockMvc, and the scripted model in place of
- * OpenAI. Both the Phase 1 {@code @AiService} proxy and the Phase 2 supervisor are built on the scripted
+ * Claude. Both the Phase 1 {@code @AiService} proxy and the Phase 2 supervisor are built on the scripted
  * model, so no network call can happen.
  */
 @AutoConfigureMockMvc
 @Import(AiTestConfig.class)
-@TestPropertySource(properties = "spring.autoconfigure.exclude=dev.langchain4j.openai.spring.AutoConfig")
+@TestPropertySource(properties = "spring.autoconfigure.exclude=dev.langchain4j.anthropic.spring.AutoConfig")
 public abstract class AbstractAiIntegrationTest extends AbstractIntegrationTest {
 }

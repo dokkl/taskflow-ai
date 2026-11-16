@@ -53,7 +53,7 @@ export function AssistantChat() {
           <span className={cn("size-2 shrink-0 rounded-full", status === null ? "bg-muted-foreground/40" : status.available ? "bg-emerald-500" : "bg-destructive")} aria-hidden="true" />
           <span className="font-medium" data-testid="active-mode">{mode === "supervisor" ? t("assistant.supervisorName") : t("assistant.mode.agent")}</span>
           <span className="hidden truncate text-muted-foreground sm:inline">
-            {status === null ? t("assistant.checking") : status.available ? `OpenAI · ${status.model}` : t("assistant.unavailable")}
+            {status === null ? t("assistant.checking") : status.available ? `Claude · ${status.model}` : t("assistant.unavailable")}
           </span>
         </div>
         <div className="flex items-center gap-2">

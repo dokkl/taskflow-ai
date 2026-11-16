@@ -32,7 +32,7 @@ public class AiServiceException extends RuntimeException {
         return retryable;
     }
 
-    /** Maps the exceptions LangChain4j and the OpenAI client throw onto HTTP statuses and plain-language messages. */
+    /** Maps the exceptions LangChain4j and the Anthropic client throw onto HTTP statuses and plain-language messages. */
     public static AiServiceException translate(Throwable error) {
         Throwable root = error;
         while (root.getCause() != null && root.getCause() != root
@@ -53,11 +53,11 @@ public class AiServiceException extends RuntimeException {
         }
         if (root instanceof AuthenticationException) {
             return new AiServiceException(HttpStatus.SERVICE_UNAVAILABLE,
-                    "The AI service rejected the configured API key. Check OPENAI_API_KEY.", false, error);
+                    "The AI service rejected the configured API key. Check ANTHROPIC_API_KEY.", false, error);
         }
         if (root instanceof ModelNotFoundException) {
             return new AiServiceException(HttpStatus.SERVICE_UNAVAILABLE,
-                    "The configured model is not available. Check langchain4j.open-ai.chat-model.model-name.", false, error);
+                    "The configured model is not available. Check langchain4j.anthropic.chat-model.model-name.", false, error);
         }
         if (root instanceof InvalidRequestException) {
             return new AiServiceException(HttpStatus.BAD_GATEWAY,

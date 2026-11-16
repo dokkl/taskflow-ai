@@ -35,7 +35,7 @@ public class AiChatController {
     private final TaskAgent taskAgentService;
     private final MultiAgentService multiAgentService;
 
-    @Value("${langchain4j.open-ai.chat-model.model-name:unknown}")
+    @Value("${langchain4j.anthropic.chat-model.model-name:unknown}")
     private String modelName;
 
     /** Lets the UI show whether the assistant is reachable and which model answers. */
